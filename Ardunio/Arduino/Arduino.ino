@@ -4,27 +4,27 @@
 
 #define Addr 0x13
 
-//#pragma region Globals
-//const char* ssid = "Claremont-ETC";             // WIFI network name
-//const char* password = "abcdeabcde";            // WIFI network password
-//
-//WiFiServer server(80);
-//
-//uint8_t connection_state = 0;                    // Connected to WIFI or not
-//uint16_t reconnect_interval = 10000;             // If not connected wait time to try again
-//#pragma endregion Globals
+#pragma region Globals
+const char* ssid = "Claremont-ETC";             // WIFI network name
+const char* password = "abcdeabcde";            // WIFI network password
 
-//// Variable to store the HTTP request
-//String header;
+WiFiServer server(80);
+
+uint8_t connection_state = 0;                    // Connected to WIFI or not
+uint16_t reconnect_interval = 10000;             // If not connected wait time to try again
+#pragma endregion Globals
+
+// Variable to store the HTTP request
+String header;
 
 // Auxiliar variables to store the current output state
 // Assign output variables to GPIO pins
 
 // Variables for sending email
-//Gsender *gsender = Gsender::Instance(); // Getting pointer to class instance
-//String email = "itsang@hmc.edu"
-//String subject = "Mail time";
-//String msg = "You've got mail!";
+Gsender *gsender = Gsender::Instance(); // Getting pointer to class instance
+String email = "itsang@hmc.edu"
+String subject = "Mail time";
+String msg = "You've got mail!";
 
 // Upper and lower ranges for luminance
 int detected = 15;
@@ -170,10 +170,7 @@ void loop(){
 
   // if mail detected 3 times, send email
   if (count == 3) {
-    // Send Email
-    digitalWrite(HIGH);
-    delay(1000);
-    digitalWrite(LOW);
+    // TODO: send email
   }
 
 //  if(gsender->Subject(subject)->Send(email, msg)) {
