@@ -1,83 +1,84 @@
-#include <ESP8266WiFi.h>
-#include "Gsender.h"
+//#include <ESP8266WiFi.h>
+//#include "Gsender.h"
 #include<Wire.h>
 
 #define Addr 0x13
 
-#pragma region Globals
-const char* ssid = "Claremont-ETC";             // WIFI network name
-const char* password = "abcdeabcde";            // WIFI network password
-
-WiFiServer server(80);
-
-uint8_t connection_state = 0;                    // Connected to WIFI or not
-uint16_t reconnect_interval = 10000;             // If not connected wait time to try again
-#pragma endregion Globals
+//#pragma region Globals
+//const char* ssid = "Claremont-ETC";             // WIFI network name
+//const char* password = "abcdeabcde";            // WIFI network password
+//
+//WiFiServer server(80);
+//
+//uint8_t connection_state = 0;                    // Connected to WIFI or not
+//uint16_t reconnect_interval = 10000;             // If not connected wait time to try again
+//#pragma endregion Globals
 
 // Variable to store the HTTP request
-String header;
+//String header;
 
 // Auxiliar variables to store the current output state
 // Assign output variables to GPIO pins
+int esp8266 = 16;     // GPIO 16 = D0
 
 // Variables for sending email
-Gsender *gsender = Gsender::Instance(); // Getting pointer to class instance
-String email = "itsang@hmc.edu"
-String subject = "Mail time";
-String msg = "You've got mail!";
+//Gsender *gsender = Gsender::Instance(); // Getting pointer to class instance
+//String email = ""
+//String subject = "Mail time";
+//String msg = "You've got mail!";
 
 // Upper and lower ranges for luminance
 int detected = 15;
 int empty = 30;
 
 
-// Connect to WiFi
-uint8_t WiFiConnect(const char* nSSID = nullptr, const char* nPassword = nullptr)
-{
-    static uint16_t attempt = 0;
-    Serial.print("Connecting to ");
-    if(nSSID) {
-        WiFi.begin(nSSID, nPassword);  
-        Serial.println(nSSID);
-    } else {
-        WiFi.begin(ssid, password);
-        Serial.println(ssid);
-    }
-
-    uint8_t i = 0;
-    while(WiFi.status()!= WL_CONNECTED && i++ < 50)
-    {
-        delay(200);
-        Serial.print(".");
-    }
-    ++attempt;
-    Serial.println("");
-    if(i == 51) {
-        Serial.print("Connection: TIMEOUT on attempt: ");
-        Serial.println(attempt);
-        if(attempt % 2 == 0)
-            Serial.println("Check if access point available or SSID and Password\r\n");
-        return false;
-    }
-    Serial.println("Connection: ESTABLISHED");
-    Serial.print("Got IP address: ");
-    Serial.println(WiFi.localIP());
-    server.begin();
-    return true;
-}
-
-void Awaits()
-{
-    uint32_t ts = millis();
-    while(!connection_state)
-    {
-        delay(50);
-        if(millis() > (ts + reconnect_interval) && !connection_state){
-            connection_state = WiFiConnect();
-            ts = millis();
-        }
-    }
-}
+//// Connect to WiFi
+//uint8_t WiFiConnect(const char* nSSID = nullptr, const char* nPassword = nullptr)
+//{
+//    static uint16_t attempt = 0;
+//    Serial.print("Connecting to ");
+//    if(nSSID) {
+//        WiFi.begin(nSSID, nPassword);  
+//        Serial.println(nSSID);
+//    } else {
+//        WiFi.begin(ssid, password);
+//        Serial.println(ssid);
+//    }
+//
+//    uint8_t i = 0;
+//    while(WiFi.status()!= WL_CONNECTED && i++ < 50)
+//    {
+//        delay(200);
+//        Serial.print(".");
+//    }
+//    ++attempt;
+//    Serial.println("");
+//    if(i == 51) {
+//        Serial.print("Connection: TIMEOUT on attempt: ");
+//        Serial.println(attempt);
+//        if(attempt % 2 == 0)
+//            Serial.println("Check if access point available or SSID and Password\r\n");
+//        return false;
+//    }
+//    Serial.println("Connection: ESTABLISHED");
+//    Serial.print("Got IP address: ");
+//    Serial.println(WiFi.localIP());
+//    server.begin();
+//    return true;
+//}
+//
+//void Awaits()
+//{
+//    uint32_t ts = millis();
+//    while(!connection_state)
+//    {
+//        delay(50);
+//        if(millis() > (ts + reconnect_interval) && !connection_state){
+//            connection_state = WiFiConnect();
+//            ts = millis();
+//        }
+//    }
+//}
 
 
 void setup()
@@ -116,15 +117,19 @@ void setup()
   delay(300);
   
   Serial.begin(115200);
-  connection_state = WiFiConnect();
-  if(!connection_state)       // if not connected to WIFI
-  Awaits();                   // constantly trying to connect
+
+  // Set up pins
+  pinMode(esp8266, OUTPUT);
+  
+//  connection_state = WiFiConnect();
+//  if(!connection_state)       // if not connected to WIFI
+//  Awaits();                   // constantly trying to connect
 
 }
 
 
 void loop(){
-  // TODO: check luminance every 5 minutes
+  // check luminance every 5 minutes
   unsigned int data[4];
   for(int i = 0; i < 4; i++)
   { 
@@ -170,11 +175,13 @@ void loop(){
 
   // if mail detected 3 times, send email
   if (count == 3) {
-    // Send Email
-    digitalWrite(HIGH);
+    // write to ESP8266 to send email
+    digitalWrite(esp8266, HIGH);
     delay(1000);
-    digitalWrite(LOW);
+    digitalWrite(esp8266, LOW);
   }
+
+  delay(300000);
 
 //  if(gsender->Subject(subject)->Send(email, msg)) {
 //      Serial.println("Message send.");
