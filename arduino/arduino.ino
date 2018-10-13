@@ -19,13 +19,19 @@
 
 // Auxiliar variables to store the current output state
 // Assign output variables to GPIO pins
-int esp8266 = 16;     // GPIO 16 = D0
+int esp8266 = 4;     // GPIO 4 = D2
 
 // Variables for sending email
 //Gsender *gsender = Gsender::Instance(); // Getting pointer to class instance
 //String email = ""
 //String subject = "Mail time";
 //String msg = "You've got mail!";
+
+// Time between checks
+int interval = 5 * 60000;
+
+// Counts number of times mail is detected continuously
+int count = 0;
 
 // Upper and lower ranges for luminance
 int detected = 15;
@@ -162,9 +168,6 @@ void loop(){
   Serial.println(proximity);
   delay(1000);
 
-  // Counts number of times mail is detected continuously
-  int count = 0;
-
   // Check luminance
   if (luminance < detected) {
     count++;
@@ -179,9 +182,10 @@ void loop(){
     digitalWrite(esp8266, HIGH);
     delay(1000);
     digitalWrite(esp8266, LOW);
+    delay(1000);
   }
 
-  delay(300000);
+  delay(interval);
 
 //  if(gsender->Subject(subject)->Send(email, msg)) {
 //      Serial.println("Message send.");

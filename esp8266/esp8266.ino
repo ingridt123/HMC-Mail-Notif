@@ -20,7 +20,7 @@ String header;
 // Auxiliar variables to store the current output state
 
 // Assign output variables to GPIO pins
-int arduino = 15;       // GPIO 15 = D1
+int arduino = 16;       // GPIO 16 = D0
 
 // Variables for sending email
 Gsender *gsender = Gsender::Instance(); // Getting pointer to class instance
@@ -67,6 +67,7 @@ uint8_t WiFiConnect(const char* nSSID = nullptr, const char* nPassword = nullptr
     Serial.print("Got IP address: ");
     Serial.println(WiFi.localIP());
     server.begin();
+    delay(1000);
     return true;
 }
 
@@ -126,31 +127,31 @@ void setup()
 
   // Set up connection
   connection_state = WiFiConnect();
-  if(!connection_state)       // if not connected to WIFI
-  Awaits();                   // constantly trying to connect
+  if(!connection_state) {       // if not connected to WIFI
+    Awaits();                   // constantly trying to connect
+  }
 
 }
 
 
 void loop() {
 
-  while (true) {
+//  inputVal = digitalRead(arduino);
+  Serial.println(digitalRead(arduino));
 
-    inputVal = digitalRead(arduino);
-
-    if (inputVal == 1) {
-
-       if(gsender -> Subject(subject) -> Send(email, msg)) {
-         Serial.println("Message send.");
-        } 
-        else {
-          Serial.print("Error sending message: ");
-          Serial.println(gsender->getError());
-        }
-      
-    }
-    
-  }
+//  if (inputVal == 1) {
+//
+//     if(gsender -> Subject(subject) -> Send(email, msg)) {
+//       Serial.println("Message send.");
+//      } 
+//      else {
+//        Serial.print("Error sending message: ");
+//        Serial.println(gsender->getError());
+//      }
+//
+//    digitalWrite(arduino, LOW);
+//    
+//  }
   
 //  // TODO: check luminance every 5 minutes
 //  unsigned int data[4];
